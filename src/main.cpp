@@ -1,13 +1,12 @@
-#include <iostream>
-#include "../../FHE.h"
+#include "../HElib/FHE.h"
 #include <NTL/lzz_pXFactoring.h>
+
 #include <fstream>
-#include <sstream>
-#include <sys/time.h>
+#include <iostream>
+
 #include "../include/layer.h"
 #include "../include/relu.h"
 
-#define MAX 55
 
 int quantize(float x, int maxq = 127, float max = 1) {
   return int(x*maxq/max);
@@ -56,7 +55,8 @@ int main(int argc, char **argv) {
    f.open(file_name);
    if (!f) {
      cout << "can't read from file " << file_name << endl;
-     return -1;
+     return -1;ecret key with Hamming weight w
+
    }
 
    vector<vector<int>> weights1(n_H);  // weights layer1

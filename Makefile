@@ -29,12 +29,9 @@ $(ODIR)/relu.o: $(SDIR)/relu.cpp $(IDIR)/relu.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 crypto_nn: $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^ ../fhe.a $(LDLIBS)
+	$(CC) $(CFLAGS) -o $@ $^ HElib/fhe.a $(LDLIBS)
 
 .PHONY: clean
 
 clean:
 	rm -f $(ODIR)/*.o
-
-x_%:
-	echo $(ODIR)/%

@@ -1,8 +1,7 @@
 #ifndef _layer_H
 #define _layer_H
 
-#include "../../FHE.h"
-#include <cstdint>
+#include "../HElib/FHE.h"
 
 class layer {
 private:
@@ -13,19 +12,7 @@ private:
   // bias array
   vector<int> b;
 
-  // activation function
-  uint8_t af;
-
-  // int64_t c0 = 52000000000;
-  // int64_t c1 = 3937008;
-  // int64_t c2 = 74;
-  // int c0 = 0;
-  // int c1 = 1;
-  // int c2 = 0;
-
   int64_t scale;
-
-  bool act_func;
 
   layer();
 

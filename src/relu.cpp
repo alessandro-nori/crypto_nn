@@ -1,6 +1,5 @@
 #include "../include/relu.h"
 #include <NTL/lzz_pXFactoring.h>
-#include <vector>
 
 // this variable is used to get int coefficient for the ReLU approximation
 static int64_t scale = 1000000000;
