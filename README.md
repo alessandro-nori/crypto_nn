@@ -10,3 +10,5 @@ To use activation functions within HE schemes, they should be approximated in a 
 In this example I simulated the ReLU function as presented in the paper and I obtained the following approximation:
 
 0.0012x<sup>2</sup> + 0.5x + 52
+
+![alt text](https://github.com/ironordnassela/crypto_nn/blob/master/relu/relu_graphic.png)
