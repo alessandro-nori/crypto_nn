@@ -1,0 +1,9 @@
+To build crypto_nn, you will need to have HElib, GMP and NTL libraries installed.
+Now that you have this libraries, you have to copy header files from Helib/src
+directory to crypto_nn/include and fhe.a to crypto_nn/lib.
+
+On the command line in the crypto_nn directory:
+
+   make
+
+will compile and build bin/crypto_nn.

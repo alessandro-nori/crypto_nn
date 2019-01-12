@@ -29,15 +29,9 @@ $(ODIR)/main.o: $(SDIR)/main.cpp
 	@mkdir -p $(ODIR)
 	@$(CC) -c -o $@ $< $(CFLAGS)
 
-$(ODIR)/layer.o: $(SDIR)/layer.cpp $(IDIR)/layer.h
+$(ODIR)/%.o: $(SDIR)/%.cpp $(IDIR)/%.h
 	@mkdir -p $(ODIR)
 	@$(CC) -c -o $@ $< $(CFLAGS)
-
-$(ODIR)/relu.o: $(SDIR)/relu.cpp $(IDIR)/relu.h
-	@mkdir -p $(ODIR)
-	@$(CC) -c -o $@ $< $(CFLAGS)
-
-
 
 .PHONY: clean
 
