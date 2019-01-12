@@ -1,4 +1,4 @@
-#include "relu.h"
+#include "../include/relu.h"
 #include <NTL/lzz_pXFactoring.h>
 #include <vector>
 

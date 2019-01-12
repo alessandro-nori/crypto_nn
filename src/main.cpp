@@ -1,11 +1,11 @@
 #include <iostream>
-#include "FHE.h"
+#include "../../FHE.h"
 #include <NTL/lzz_pXFactoring.h>
 #include <fstream>
 #include <sstream>
 #include <sys/time.h>
-#include "layer.h"
-#include "relu.h"
+#include "../include/layer.h"
+#include "../include/relu.h"
 
 #define MAX 55
 
@@ -13,7 +13,13 @@ int quantize(float x, int maxq = 127, float max = 1) {
   return int(x*maxq/max);
 }
 
-int main() {
+int main(int argc, char **argv) {
+
+    if (argc < 2) {
+      cerr << "usage: " << argv[0] << " <weights_file_path>" << endl;
+      exit(-1);
+    }
+
     long m=0, p=1308355967371729  , r=1; // Native plaintext space
     // Computations will be 'modulo p'
     long L=11;          // Levels
@@ -46,7 +52,7 @@ int main() {
    int n_input = 2, n_H = 2, n_output = 1;
 
    ifstream f;
-   string file_name = "weights.txt";
+   string file_name = argv[1];
    f.open(file_name);
    if (!f) {
      cout << "can't read from file " << file_name << endl;

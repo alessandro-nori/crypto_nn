@@ -1,7 +1,7 @@
 #ifndef _layer_H
 #define _layer_H
 
-#include "FHE.h"
+#include "../../FHE.h"
 #include <cstdint>
 
 class layer {
