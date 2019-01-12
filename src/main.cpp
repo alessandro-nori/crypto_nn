@@ -1,4 +1,4 @@
-#include "../HElib/FHE.h"
+#include "../include/FHE.h"
 #include <NTL/lzz_pXFactoring.h>
 
 #include <fstream>
@@ -7,8 +7,9 @@
 #include "../include/layer.h"
 #include "../include/relu.h"
 
+#define MAXQ 127
 
-int quantize(float x, int maxq = 127, float max = 1) {
+int quantize(float x, int maxq = MAXQ, float max = 1) {
   return int(x*maxq/max);
 }
 
@@ -55,8 +56,7 @@ int main(int argc, char **argv) {
    f.open(file_name);
    if (!f) {
      cout << "can't read from file " << file_name << endl;
-     return -1;ecret key with Hamming weight w
-
+     return -1;
    }
 
    vector<vector<int>> weights1(n_H);  // weights layer1
@@ -91,8 +91,8 @@ int main(int argc, char **argv) {
 
    f.close();
 
-   layer l1(2, 2, 0, weights1, bias1);
-   layer l2(2, 1, 0, weights2, bias2, get_scale());
+   layer l1(2, 2, weights1, bias1);
+   layer l2(2, 1, weights2, bias2, get_scale());
 
    long i1 = 10;
    long i2 = 13;
@@ -118,11 +118,11 @@ int main(int argc, char **argv) {
    outputC = l2.feed_forward(outputC);
    output = l2.feed_forward(output);
 
-   cout << "output1 da input non cifrato: " << output[0] << endl;
+   cout << "output1 da input non cifrato: " << (double)output[0]/get_scale()/MAXQ << endl;
 
    ZZX outputZ;
    secretKey.Decrypt(outputZ, outputC[0]);
-   cout << "output1 da input cifrato: " << coeff(outputZ, 0) << endl;
+   cout << "output1 da input cifrato: " << coeff(outputZ, 0)/get_scale()/MAXQ << endl;
 
 
    return 0;

@@ -1,6 +1,9 @@
 IDIR = include
-ODIR = obj
+ODIR = build
 SDIR = src
+LDIR = lib
+
+TARGET = bin/crypto_nn
 
 CC = g++
 CFLAGS = -g -O2 -std=c++11 -pthread -DFHE_THREADS -DFHE_BOOT_THREADS -fmax-errors=2
@@ -19,19 +22,24 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 _OBJ = main.o layer.o relu.o 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDIR)/fhe.a $(LDLIBS)
+
 $(ODIR)/main.o: $(SDIR)/main.cpp
-	$(CC) -c -o $@ $< $(CFLAGS)
+	@mkdir -p $(ODIR)
+	@$(CC) -c -o $@ $< $(CFLAGS)
 
 $(ODIR)/layer.o: $(SDIR)/layer.cpp $(IDIR)/layer.h
-	$(CC) -c -o $@ $< $(CFLAGS)
+	@mkdir -p $(ODIR)
+	@$(CC) -c -o $@ $< $(CFLAGS)
 
 $(ODIR)/relu.o: $(SDIR)/relu.cpp $(IDIR)/relu.h
-	$(CC) -c -o $@ $< $(CFLAGS)
+	@mkdir -p $(ODIR)
+	@$(CC) -c -o $@ $< $(CFLAGS)
 
-crypto_nn: $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^ HElib/fhe.a $(LDLIBS)
+
 
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o
+	@rm -rf $(ODIR) $(TARGET) 
