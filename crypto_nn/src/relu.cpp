@@ -2,11 +2,11 @@
 #include <NTL/lzz_pXFactoring.h>
 
 // this variable is used to get int coefficient for the ReLU approximation
-static int64_t scale = 1000000000;
+static int64_t scale = 10000;
 
-static int64_t c0 = 52000000000; // constant
-static int64_t c1 = 3937008; // coefficient for degree 1
-static int64_t c2 = 74;  // coefficient for degree 2
+static int64_t c0 = 520000; // constant
+static int64_t c1 = 5000; // coefficient for degree 1
+static int64_t c2 = 12;  // coefficient for degree 2
 
 
 vector<Ctxt> relu(vector<Ctxt> input) {

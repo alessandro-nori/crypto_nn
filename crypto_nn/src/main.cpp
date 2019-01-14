@@ -10,13 +10,14 @@
 #define MAXQ 127
 
 int quantize(float x, int maxq = MAXQ, float max = 1) {
-  return int(x*maxq/max);
+  int xq = int(x*maxq/max);
+  return xq;
 }
 
 int main(int argc, char **argv) {
 
-    if (argc < 2) {
-      cerr << "usage: " << argv[0] << " <weights_file_path>" << endl;
+    if (argc < 3) {
+      cerr << "usage: " << argv[0] << " <weights_file_path> <test_dataset>" << endl;
       exit(-1);
     }
 
@@ -55,75 +56,99 @@ int main(int argc, char **argv) {
    string file_name = argv[1];
    f.open(file_name);
    if (!f) {
-     cout << "can't read from file " << file_name << endl;
+     cout << "can't load neural network parameters from " << file_name << endl;
      return -1;
    }
 
-   vector<vector<int>> weights1(n_H);  // weights layer1
-   vector<int> bias1(n_H); // bias layer 1
+
+   // initialization hidden layer
+   vector<vector<int>> weights1(n_H);  // weights
+   vector<int> bias1(n_H); // bias
    for (int i=0; i<n_H; i++) {
      float w1, w2, b;
-     f >> w1;
-     f >> w2;
-     f >> b;
+     f >> w1 >> w2 >> b;
      vector<int> w(n_input);
      w[0] = quantize(w1);
      w[1] = quantize(w2);
      bias1[i] = quantize(b);
-     cout << w[0] << " " << w[1] << " " << bias1[i] << endl;
+     // cout << w[0] << " " << w[1] << " " << bias1[i] << endl;
      weights1[i] = w;
    }
 
+   // initialization output layer
    vector<vector<int>> weights2(n_output);
    vector<int> bias2(n_output);
    for (int i=0; i<n_output; i++) {
      float w1, w2, b;
-     f >> w1;
-     f >> w2;
-     f >> b;
+     f >> w1 >> w2 >> b;
      vector<int> w(n_H);
      w[0] = quantize(w1);
      w[1] = quantize(w2);
      bias2[i] = quantize(b);
-     cout << w[0] << " " << w[1] << " " << bias2[i] << endl;
+     // cout << w[0] << " " << w[1] << " " << bias2[i] << endl;
      weights2[i] = w;
    }
 
    f.close();
 
    layer l1(2, 2, weights1, bias1);
-   layer l2(2, 1, weights2, bias2, get_scale());
+   layer l2(2, 1, weights2, bias2, get_scale()*127);
 
-   long i1 = 10;
-   long i2 = 13;
+   cout << "Neural network parameters loaded" << endl;
 
-   Ctxt ctx1(publicKey);
-   Ctxt ctx2(publicKey);
+   f.open(argv[2]);
+   if (!f) {
+     cout << "can't load data for test" << endl;
+     return -1;
+   }
 
-   publicKey.Encrypt(ctx1, to_ZZX(i1));
-   publicKey.Encrypt(ctx2, to_ZZX(i2));
+   ofstream fout;
+   fout.open("pred.txt");
+   if (!f) {
+     cout << "can't output the predictions" << endl;
+     return -1;
+   }
 
-   vector<Ctxt> inputC;
-   inputC.push_back(ctx1);
-   inputC.push_back(ctx2);
+   long x1, x2, pred;
+   while (f >> x1 >> x2 >> pred) {
 
-   vector<long> input;
-   input.push_back(i1);
-   input.push_back(i2);
+     // this should be done client side and cipher inputs should be sent to the Cloud
+     Ctxt ctx1(publicKey);
+     Ctxt ctx2(publicKey);
 
-   vector<Ctxt> outputC = relu(l1.feed_forward(inputC));
-   vector<long> output = relu(l1.feed_forward(input));
+     publicKey.Encrypt(ctx1, to_ZZX(x1));
+     publicKey.Encrypt(ctx2, to_ZZX(x2));
+     //
 
+     // what the Cloud receives
+     vector<Ctxt> inputC;
+     inputC.push_back(ctx1);
+     inputC.push_back(ctx2);
 
-   outputC = l2.feed_forward(outputC);
-   output = l2.feed_forward(output);
+     vector<Ctxt> outputC = relu(l1.feed_forward(inputC));
 
-   cout << "output1 da input non cifrato: " << (double)output[0]/get_scale()/MAXQ << endl;
+     outputC = l2.feed_forward(outputC);
+     // now the Cloud can send back the cipher output to the client which can decrypt it
 
-   ZZX outputZ;
-   secretKey.Decrypt(outputZ, outputC[0]);
-   cout << "output1 da input cifrato: " << coeff(outputZ, 0)/get_scale()/MAXQ << endl;
+     ZZX outputZ;
+     secretKey.Decrypt(outputZ, outputC[0]);
 
+     /*
+     * plain output is scaled of 127*127 (due to weights quantization) * 10000 (due to integer coefficient of ReLU)
+     * in my solution the Cloud should also send this value to the client in order to allow it to convert the output to real from integer
+     */
+
+     cout << "plain input: " << x1 << " " << x2 << endl;
+     cout << "plain output: " << coeff(outputZ, 0) << endl;
+     cout << endl;
+
+     fout << x1 << " " << x2 << " " << coeff(outputZ, 0) << endl;
+
+   }
+
+   f.close();
+
+   cout << "output scale: " << MAXQ*MAXQ*get_scale() << endl;
 
    return 0;
 }
