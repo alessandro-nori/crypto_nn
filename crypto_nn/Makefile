@@ -2,6 +2,7 @@ IDIR = include
 ODIR = build
 SDIR = src
 LDIR = lib
+BDIR = bin
 
 TARGET = bin/crypto_nn
 
@@ -23,6 +24,7 @@ _OBJ = main.o layer.o relu.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(TARGET): $(OBJ)
+	@mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDIR)/fhe.a $(LDLIBS)
 
 $(ODIR)/main.o: $(SDIR)/main.cpp
